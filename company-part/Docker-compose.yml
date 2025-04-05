@@ -1,0 +1,39 @@
+version: "1.0"
+
+services:
+  postgres:
+    image: postgres
+    command: -c 'max_connections=600'
+    environment:
+      POSTGRES_DB: "companyDB"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./user-data:/var/lib/postgresql/data
+    ports:
+      - "5454:5432"
+
+  usercompanyservice:
+    image: openjdk:23-jdk
+    ports:
+      - "8080:8080"
+    expose:
+      - "8000-8080"
+      - "5432-5454"
+    volumes:
+      - ./target/user-company-service-0.0.1-SNAPSHOT.jar:/app.jar
+    entrypoint:
+      - "java"
+      - "-jar"
+      - "-Xmx768m"
+      - "/app.jar"
+      - "com.example.user_company_service.UserCompanyServiceApplication"
+
+  spring:
+    application:
+      name: user-company-microservice
+      config:
+        import: http://localhost:8888/
+
+#docker run --name docker-postgres -p 5454:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=companyDB -d postgres:17
