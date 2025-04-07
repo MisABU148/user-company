@@ -1,0 +1,77 @@
+version: "1.0"
+
+services:
+  postgresU:
+    image: postgres
+    command: -c 'max_connections=600'
+    environment:
+      POSTGRES_DB: "userDB"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./user-dataU:/var/lib/postgresql/data
+    ports:
+      - "5455:5432"
+
+  postgresC:
+    image: postgres
+    command: -c 'max_connections=600'
+    environment:
+      POSTGRES_DB: "companyDB"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./user-dataC:/var/lib/postgresql/data
+    ports:
+      - "5454:5432"
+
+  companyservice:
+    image: openjdk:23-jdk
+    ports:
+      - "8084:8084"
+    expose:
+      - "8000-8084"
+      - "5432-5454"
+    volumes:
+      - ../company-part/target/company-part-0.0.1-SNAPSHOT.jar:/app.jar
+    entrypoint:
+      - "java"
+      - "-jar"
+      - "-Xmx768m"
+      - "/app.jar"
+      - "mi.usercopmany.companypart.CompanyPartApplication"
+
+  userservice:
+    image: openjdk:23-jdk
+    ports:
+      - "8085:8085"
+    expose:
+      - "8000-8085"
+      - "5432-5455"
+    volumes:
+      - ../user-part/target/user-part-0.0.1-SNAPSHOT.jar:/app.jar
+    entrypoint:
+      - "java"
+      - "-jar"
+      - "-Xmx768m"
+      - "/app.jar"
+      - "mi.usercompany.userpart.UserPartApplication"
+
+
+
+  cloud:
+    image: openjdk:23-jdk
+    ports:
+      - "8888:8888"
+    expose:
+      - "8000-8888"
+    volumes:
+      - ./target/server-0.0.1-SNAPSHOT.jar:/app.jar
+    entrypoint:
+      - "java"
+      - "-jar"
+      - "-Xmx768m"
+      - "/app.jar"
+      - "mi.usercompany.server.ServerApplication"

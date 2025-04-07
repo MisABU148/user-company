@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Transactional
 public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
@@ -19,4 +21,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     void updateById(@Param("userDto") UserDto userDto);
 
 
+    User getUserById(Long id);
+    @Query(value = "SELECT * FROM users ORDER BY id LIMIT :pageSize OFFSET :page;", nativeQuery = true)
+    List<User> findPart(Long page, Long pageSize);
 }

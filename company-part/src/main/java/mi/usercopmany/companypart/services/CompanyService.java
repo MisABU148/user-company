@@ -1,40 +1,21 @@
 package mi.usercopmany.companypart.services;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import mi.usercopmany.companypart.dto.CompanyDto;
-import mi.usercopmany.companypart.dto.mapping.CompanyMapping;
-import mi.usercopmany.companypart.models.Company;
-import mi.usercopmany.companypart.repositories.CompanyRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
-@Slf4j
-@Service
-public class CompanyService {
-    @Autowired
-    private CompanyRepository companyRepository;
-
-    @Autowired
-    private CompanyMapping companyMapping;
-
-    public void createCompany(CompanyDto companyDTO) {
-        Company newCompany = companyMapping.mapToCompanyEntity(companyDTO);
-        companyRepository.save(newCompany);
-    }
-
-    public List<CompanyDto> readCompany() {
-        return companyRepository.findAll().stream()
-                .map(company -> companyMapping.mapToCompanyDto(company))
-                .toList();
-    }
-
-    public void deleteCompany(Long id) {
-        companyRepository.deleteById(id);
-    }
-
-    public void updateCompany(CompanyDto companyDto) {
-        companyRepository.updateById(companyDto);
-    }
+@Validated
+public interface CompanyService {
+    void createCompany(@Valid CompanyDto companyDTO);
+    List<CompanyDto> readCompany(@NotNull Long page, @NotNull Long pageSize);
+    void deleteCompany(@NotNull @Positive Long id);
+    void updateCompany(CompanyDto companyDto);
+    void addUser(@NotNull @Positive Long userId, @NotNull @Positive Long companyId);
+    void deleteUser(@NotNull @Positive Long Id);
+    CompanyDto getCompany(@NotNull @Positive Long id);
+    CompanyDto getOnlyCompany(@NotNull @Positive Long id);
 }
